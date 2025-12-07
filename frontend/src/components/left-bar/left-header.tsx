@@ -6,7 +6,7 @@ const LeftHeader = () => {
   return (
     <div className="flex py-2 px-3 items-center justify-between bg-sidebar border-b border-sidebar-border">
       <div>
-        <ProfileAvatar />
+        <ProfileAvatar className="w-10 h-10"/>
       </div>
       <div>
         <EllipsisVerticalIcon />

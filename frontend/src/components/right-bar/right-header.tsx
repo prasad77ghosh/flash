@@ -6,7 +6,7 @@ const RightHeader = () => {
   return (
     <div className="flex py-2 px-7 items-center justify-between bg-background border-b border-border">
       <div>
-        <ProfileAvatar />
+        <ProfileAvatar className="w-10 h-10"/>
       </div>
       <div>
         <Search />

@@ -1,14 +1,20 @@
 import Redis, { Redis as RedisType } from "ioredis";
-import { NotFound } from "http-errors";
 
 export class RedisConfig {
   private static pubClient: RedisType | null = null;
   private static subClient: RedisType | null = null;
   private static cacheClient: RedisType | null = null;
+
   private static initialized = false;
 
+  /**
+   * ------------------------------------------------------
+   * 1️⃣ Initialize Redis Clients (Call Only Once)
+   * ------------------------------------------------------
+   */
   static async initialize(): Promise<void> {
-    if (this.initialized) return;
+    if (this.initialized) return; // avoid re-initialization
+
     try {
       const redisUrl = process.env.REDIS_URL || "redis://localhost:6379";
 
@@ -48,18 +54,52 @@ export class RedisConfig {
     }
   }
 
+  /**
+   * ------------------------------------------------------
+   * 2️⃣ Return All Clients Together
+   * ------------------------------------------------------
+   */
+  static getClients(): {
+    pubClient: RedisType;
+    subClient: RedisType;
+    cacheClient: RedisType;
+  } {
+    if (!this.pubClient || !this.subClient || !this.cacheClient) {
+      throw new Error("Redis clients NOT initialized. Call RedisConfig.initialize() first.");
+    }
+
+    return {
+      pubClient: this.pubClient,
+      subClient: this.subClient,
+      cacheClient: this.cacheClient,
+    };
+  }
+
+  /**
+   * ------------------------------------------------------
+   * 3️⃣ Individual Getter Functions
+   * ------------------------------------------------------
+   */
   static getPubClient(): RedisType {
-    if (!this.pubClient) throw new NotFound("Publishe notr found!");
+    if (!this.pubClient) throw new Error("Redis pub client not initialized");
     return this.pubClient;
   }
+
   static getSubClient(): RedisType {
-    if (!this.subClient) throw new NotFound("Subscriber not found!");
+    if (!this.subClient) throw new Error("Redis sub client not initialized");
     return this.subClient;
   }
+
   static getCacheClient(): RedisType {
-    if (!this.cacheClient) throw new NotFound("Cache client not found!");
+    if (!this.cacheClient) throw new Error("Redis cache client not initialized");
     return this.cacheClient;
   }
+
+  /**
+   * ------------------------------------------------------
+   * 4️⃣ Close All Connections
+   * ------------------------------------------------------
+   */
   static async closeAll(): Promise<void> {
     await Promise.all([
       this.pubClient?.quit(),
