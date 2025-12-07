@@ -11,6 +11,8 @@ const page = () => {
           <SingleChatCard/>
         </div>
       </div>
+
+      {/* right bar */}
       <div className="w-[75%] flex flex-col bg-background">
         <RightHeader />
         <div className="flex-1 overflow-auto">
