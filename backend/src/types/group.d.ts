@@ -1,11 +1,12 @@
 import { Message } from "./message";
-import { User } from "./user";
 
 export interface Group {
-  name: String;
-  description: String;
-  created_by:User,
-  lastMessage?: Message
+  _id: string;
+  name: string;
+  description: string;
+  isPrivate: boolean;
+  profile?: string | null;  // <-- allow null
+  lastMessage?: Message | null;
   createdAt: Date;
   updatedAt: Date;
 }

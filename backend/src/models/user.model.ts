@@ -1,18 +1,5 @@
 import { Schema, model, Model } from "mongoose";
-import { User } from "../types/user";
-
-
-// export
-//   interface User {
-//   _id: any;
-//   name: string;
-//   email: string;
-//   password?: string;
-//   avatar?: string;
-//   isVerified:boolean,
-//   createdAt: Date;
-//   updatedAt: Date;
-// }
+import { User } from "../types/user"
 
 const userSchema = new Schema<User, Model<User>>(
   {

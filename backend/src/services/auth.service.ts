@@ -64,6 +64,8 @@ export class AuthService {
     const accessToken = jwtService.generateAccessToken(payload);
     const refreshToken = jwtService.generateRefreshToken(payload);
 
+    // here i can put device count logic
+
     return { user, accessToken, refreshToken };
   }
 
