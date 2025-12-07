@@ -1,7 +1,16 @@
-import express from 'express';
+import App from "./app";
+import { port } from "./config";
+const appInstance = new App();
+appInstance.listen(port);
 
-const app = express();
+// Graceful shutdown handlers
+process.on('SIGTERM', async () => {
+    console.log('📥 SIGTERM signal received');
+    await App.shutdown();
+});
 
-app.listen(5000, () => {
-    console.log("Server listenting at 5000")
-})
+process.on('SIGINT', async () => {
+    console.log('📥 SIGINT signal received');
+    await App.shutdown();
+});
+
