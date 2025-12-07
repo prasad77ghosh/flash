@@ -2,10 +2,11 @@ import compression from "compression";
 import express, { Application } from "express";
 import helmet from "helmet";
 import cors from "cors";
-import {Response, Request, NextFunction} from 'express';
+import { Response, Request, NextFunction } from "express";
 import cookieParser from "cookie-parser";
 import { createServer, Server } from "node:http";
 import BottomMiddleware from "./middlewares/bottom.middleware";
+import AuthRoutes from "./routes/auth.routes";
 
 class App {
   public app: Application;
@@ -40,7 +41,10 @@ class App {
     new BottomMiddleware(this.app);
   }
 
-  private initilizeToutes() {}
+  private initilizeToutes() {
+    const authRoutes = new AuthRoutes();
+    this.app.use(`/api/v1/${authRoutes.path}`, authRoutes.router);
+  }
 
   public listen(port: number) {
     App.server = createServer(this.app);
@@ -49,7 +53,7 @@ class App {
     });
   }
 
-   private cacheClear(req: Request, res: Response, next: NextFunction) {
+  private cacheClear(req: Request, res: Response, next: NextFunction) {
     res.header("Cache-Control", "no-cache, no-store, must-revalidate");
     res.header("Pragma", "no-cache");
     res.header("Expires", "0");
