@@ -1,3 +1,4 @@
+import { CreateMemberType } from "./member";
 import { Message } from "./message";
 
 export interface Group {
@@ -9,4 +10,15 @@ export interface Group {
   lastMessage?: Message | null;
   createdAt: Date;
   updatedAt: Date;
+}
+
+
+
+
+export type CreateGroupType = {
+  name: string,
+  description?:string,
+  isPrivate?:boolean,
+  profile?:string
+  members?: CreateMemberType[]
 }
