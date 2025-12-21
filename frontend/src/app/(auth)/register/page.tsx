@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,10 +16,32 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+
 import { Eye, EyeOff, Mail, Lock, User, Zap, ArrowLeft } from "lucide-react";
+import { RegisterFormType, registerSchema } from "@/validations/register";
+import { usePost } from "@/hooks/use-post";
+import { useRouter } from "next/navigation";
+
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { postData, loading } = usePost();
+  const router = useRouter();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterFormType>({
+    resolver: zodResolver(registerSchema),
+  });
+
+  const onSubmit: SubmitHandler<RegisterFormType> = async (data) => {
+    console.log("Validated Data:", data);
+    const res = await postData("/auth/register", data, { toast: true });
+    if (!res.success) return;
+    router.push("/login");
+  };
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4 relative">
@@ -42,51 +67,51 @@ export default function RegisterPage() {
         </CardHeader>
 
         <CardContent>
-          <form className="space-y-4">
-            {/* === NAME === */}
+          <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                 <Input
                   id="name"
-                  name="name"
-                  type="text"
                   placeholder="John Doe"
                   className="pl-10 h-11"
+                  {...register("name")}
                 />
               </div>
+              {errors.name && (
+                <p className="text-sm text-red-500">{errors.name.message}</p>
+              )}
             </div>
 
-            {/* === EMAIL === */}
             <div className="space-y-2">
               <Label htmlFor="email">Email Address</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                 <Input
                   id="email"
-                  name="email"
                   type="email"
                   placeholder="you@example.com"
                   className="pl-10 h-11"
+                  {...register("email")}
                 />
               </div>
+              {errors.email && (
+                <p className="text-sm text-red-500">{errors.email.message}</p>
+              )}
             </div>
 
-            {/* === PASSWORD === */}
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-
                 <Input
                   id="password"
-                  name="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   className="pl-10 pr-10 h-11"
+                  {...register("password")}
                 />
-
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
@@ -99,22 +124,24 @@ export default function RegisterPage() {
                   )}
                 </button>
               </div>
+              {errors.password && (
+                <p className="text-sm text-red-500">
+                  {errors.password.message}
+                </p>
+              )}
             </div>
 
-            {/* === CONFIRM PASSWORD === */}
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirm Password</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-
                 <Input
                   id="confirmPassword"
-                  name="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="••••••••"
                   className="pl-10 pr-10 h-11"
+                  {...register("confirmPassword")}
                 />
-
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
@@ -127,11 +154,15 @@ export default function RegisterPage() {
                   )}
                 </button>
               </div>
+              {errors.confirmPassword && (
+                <p className="text-sm text-red-500">
+                  {errors.confirmPassword.message}
+                </p>
+              )}
             </div>
 
-            {/* SUBMIT BUTTON */}
-            <Button type="submit" className="w-full mt-6 h-11 text-base">
-              Create Account
+            <Button type="submit" className="w-full mt-6 h-11 text-base cursor-pointer">
+              {loading ? "Creating.." : "Create Account"}
             </Button>
           </form>
         </CardContent>
