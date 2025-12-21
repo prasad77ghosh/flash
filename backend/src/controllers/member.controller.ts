@@ -4,7 +4,6 @@ import { AuthRequest } from "../types/auth";
 import { fieldValidateError } from "../helpers/field-validation.helper";
 
 export class MemberController {
-  // 🔹 CREATE MEMBER
   async createMember(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       fieldValidateError(req);
@@ -25,7 +24,6 @@ export class MemberController {
     }
   }
 
-  // 🔹 GET ALL MEMBERS (Cursor Pagination)
   async getAllMembers(req: Request, res: Response, next: NextFunction) {
     try {
       fieldValidateError(req);
@@ -55,7 +53,6 @@ export class MemberController {
     }
   }
 
-  // 🔹 GET MEMBER BY ID
   async getMemberById(req: Request, res: Response, next: NextFunction) {
     try {
       const { id }:any = req.params;
@@ -72,7 +69,6 @@ export class MemberController {
     }
   }
 
-  // 🔹 UPDATE MEMBER
   async updateMember(req: Request, res: Response, next: NextFunction) {
     try {
       fieldValidateError(req);

@@ -95,10 +95,10 @@ export class SocketServer {
         );
 
         // Track connection
-        // this.activeConnections.set(userId, socket.id);
+        this.activeConnections.set(userId, socket.id);
 
         // Cache user socket ID in Redis for cross-server communication
-        // await this.cacheUserSocket(userId, socket.id);
+        await this.cacheUserSocket(userId, socket.id);
 
         //   // Attach handlers to this socket
         //   this.roomHandler.handleConnection(socket);
@@ -134,10 +134,10 @@ export class SocketServer {
 
     try {
       // Remove from active connections
-      this.activeConnections.delete(userId);
+      // this.activeConnections.delete(userId);
 
       // Remove from Redis cache
-      await this.removeUserSocket(userId);
+      // await this.removeUserSocket(userId);
 
       // Handle room cleanup if user was in a room
       //   if (socket.roomCode) {
