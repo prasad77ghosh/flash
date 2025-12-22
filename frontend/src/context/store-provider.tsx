@@ -1,25 +1,19 @@
-/* eslint-disable react-hooks/refs */
 "use client";
-import { useState, useRef } from "react";
-import { Provider } from 'react-redux';
-import { makeStore, AppStore } from "../store/store";
+import { persistor, store } from "@/store/store";
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
 
-export default function StoreProvider({
+
+export default function Providers({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const storeRef = useRef<AppStore | null>(null);
-  const [store, setStore] = useState<AppStore | null>(null);
-
-  if (!store && !storeRef.current) {
-    storeRef.current = makeStore();
-    setStore(storeRef.current);
-  }
-
-  if (!store) {
-    return null;
-  }
-
-  return <Provider store={store}>{children}</Provider>;
+  return (
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        {children}
+      </PersistGate>
+    </Provider>
+  );
 }

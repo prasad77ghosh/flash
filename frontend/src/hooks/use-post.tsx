@@ -6,6 +6,7 @@ import { useState } from "react";
 
 interface PostOptions {
   toast?: boolean; // auto-toast
+  message?: string
 }
 
 export function usePost<T = any>() {
@@ -25,7 +26,8 @@ export function usePost<T = any>() {
 
       if (options.toast) {
         const { toast } = await import("sonner");
-        toast.success("Request successful");
+        const msg = (res.data as any).msg
+        toast.success(msg || options?.message || "Request successful");
       }
 
       return { success: true, data: res.data };

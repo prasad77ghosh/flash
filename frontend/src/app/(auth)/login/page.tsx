@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,36 +17,27 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Eye, EyeOff, Mail, Lock, Zap, ArrowLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { usePost } from "@/hooks/use-post";
 
-function LoginPage() {
+import { Eye, EyeOff, Mail, Lock, Zap, ArrowLeft } from "lucide-react";
+import { usePost } from "@/hooks/use-post";
+import { LoginFormType, loginSchema } from "@/validations/login";
+
+export default function LoginPage() {
   const router = useRouter();
   const { postData, loading } = usePost();
-
   const [showPassword, setShowPassword] = useState(false);
-
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormType>({
+    resolver: zodResolver(loginSchema),
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const res = await postData(
-      "/auth/login",
-      {
-        email: form.email,
-        password: form.password,
-      },
-      { toast: true }
-    );
-
+  const onSubmit: SubmitHandler<LoginFormType> = async (data) => {
+    const res = await postData("/auth/login", data, { toast: true});
     if (!res.success) return;
-
-    router.push("/host");
+    router.push("/");
   };
 
   return (
@@ -69,32 +64,31 @@ function LoginPage() {
         </CardHeader>
 
         <CardContent>
-          <form className="space-y-4" onSubmit={handleSubmit}>
+          <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+            {/* Email */}
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium">
-                Email Address
-              </Label>
-
+              <Label htmlFor="email">Email Address</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                 <Input
                   id="email"
-                  name="email"
                   type="email"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
                   placeholder="you@example.com"
-                  className="pl-10 h-11 transition-all focus:ring-2 focus:ring-primary/20"
-                  required
+                  className="pl-10 h-11"
+                  {...register("email")}
                 />
               </div>
+              {errors.email && (
+                <p className="text-sm text-red-500">
+                  {errors.email.message}
+                </p>
+              )}
             </div>
 
+            {/* Password */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-sm font-medium">
-                  Password
-                </Label>
+                <Label htmlFor="password">Password</Label>
                 <Link
                   href="/forgot-password"
                   className="text-xs text-primary hover:text-primary/80 transition-colors"
@@ -107,21 +101,15 @@ function LoginPage() {
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                 <Input
                   id="password"
-                  name="password"
                   type={showPassword ? "text" : "password"}
-                  value={form.password}
-                  onChange={(e) =>
-                    setForm({ ...form, password: e.target.value })
-                  }
                   placeholder="••••••••"
-                  className="pl-10 pr-10 h-11 transition-all focus:ring-2 focus:ring-primary/20"
-                  required
+                  className="pl-10 pr-10 h-11"
+                  {...register("password")}
                 />
-
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                 >
                   {showPassword ? (
                     <EyeOff className="size-4" />
@@ -130,12 +118,18 @@ function LoginPage() {
                   )}
                 </button>
               </div>
+
+              {errors.password && (
+                <p className="text-sm text-red-500">
+                  {errors.password.message}
+                </p>
+              )}
             </div>
 
             <Button
               disabled={loading}
               type="submit"
-              className="w-full mt-6 h-11 text-base font-semibold shadow-lg hover:shadow-xl transition-all"
+              className="w-full mt-6 h-11 text-base cursor-pointer"
             >
               {loading ? "Signing In..." : "Sign In"}
             </Button>
@@ -147,7 +141,7 @@ function LoginPage() {
             Don&apos;t have an account?{" "}
             <Link
               href="/register"
-              className="text-primary font-semibold hover:text-primary/80 transition-colors"
+              className="text-primary font-semibold hover:text-primary/80"
             >
               Sign up
             </Link>
@@ -157,5 +151,3 @@ function LoginPage() {
     </div>
   );
 }
-
-export default LoginPage;
